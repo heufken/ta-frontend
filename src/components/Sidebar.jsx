@@ -65,41 +65,6 @@ export default function Sidebar() {
             </NavLink>
           </li>
 
-          {/* List Surat Masuk */}
-          <li className="px-2 lg:px-5">
-            <NavLink
-              to="/dashboard/surat-masuk"
-              className={({ isActive }) =>
-                "flex items-center gap-x-3 py-2 px-3 text-sm rounded-lg hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 text-gray-800 hover:text-blue-600 focus:text-blue-600 " +
-                (isActive ? "bg-gray-100 text-blue-600" : "")
-              }
-            >
-              {/* icon */}
-              <svg className="shrink-0 mt-0.5 size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="7" width="18" height="13" rx="2" />
-                <path d="M3 7l3-4h12l3 4" />
-              </svg>
-              DUMMY List Surat Masuk
-            </NavLink>
-          </li>
-
-          {/* Form Surat Keluar */}
-          <li className="px-2 lg:px-5">
-            <NavLink
-              to="/dashboard/form-surat-keluar"
-              className={({ isActive }) =>
-                "flex items-center gap-x-3 py-2 px-3 text-sm rounded-lg hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 text-gray-800 hover:text-blue-600 focus:text-blue-600 " +
-                (isActive ? "bg-gray-100 text-blue-600" : "")
-              }
-            >
-              {/* icon */}
-              <svg className="shrink-0 mt-0.5 size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path d="M12 5v14m7-7H5" />
-              </svg>
-              DUMMY Form Surat Keluar
-            </NavLink>
-          </li>
-
           {/* Buku Agenda Dropdown (Accordion) */}
           <li className="hs-accordion px-2 lg:px-5" id="arsip-surat-accordion">
             <button
@@ -119,7 +84,7 @@ export default function Sidebar() {
                 <rect x="3" y="7" width="18" height="13" rx="2" />
                 <path d="M3 7l3-4h12l3 4" />
               </svg>
-              Arsip Surat
+              Persuratan
               <svg
                 className="hs-accordion-active:-rotate-180 shrink-0 mt-1 size-3.5 ms-auto transition"
                 xmlns="http://www.w3.org/2000/svg"
@@ -143,18 +108,7 @@ export default function Sidebar() {
               <ul className="flex flex-col gap-y-1 mt-1">
                 <li>
                   <NavLink
-                    to="/dashboard/semua-dokumen"
-                    className={({ isActive }) =>
-                      "flex gap-x-3 py-2 px-3 text-sm rounded-lg hover:bg-gray-100 focus:outline-hidden text-gray-800 hover:text-blue-600 focus:text-blue-600 " +
-                      (isActive ? "bg-gray-100 text-blue-600" : "")
-                    }
-                  >
-                    Semua Dokumen
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/dashboard/surat-masuk"
+                    to="/dashboard/form-surat-masuk"
                     className={({ isActive }) =>
                       "flex gap-x-3 py-2 px-3 text-sm rounded-lg hover:bg-gray-100 focus:outline-hidden text-gray-800 hover:text-blue-600 focus:text-blue-600 " +
                       (isActive ? "bg-gray-100 text-blue-600" : "")
@@ -165,7 +119,7 @@ export default function Sidebar() {
                 </li>
                 <li>
                   <NavLink
-                    to="/dashboard/surat-keluar"
+                    to="/dashboard/form-surat-keluar"
                     className={({ isActive }) =>
                       "flex gap-x-3 py-2 px-3 text-sm rounded-lg hover:bg-gray-100 focus:outline-hidden text-gray-800 hover:text-blue-600 focus:text-blue-600 " +
                       (isActive ? "bg-gray-100 text-blue-600" : "")
@@ -258,6 +212,93 @@ export default function Sidebar() {
               </ul>
             </div>
           </li>
+
+          {/* Kategori */}
+          <li className="px-2 lg:px-5">
+            <NavLink
+              to="/dashboard/kategori"
+              className={({ isActive }) =>
+                "flex items-center gap-x-3 py-2 px-3 text-sm rounded-lg disabled:opacity-50 disabled:pointer-events-none px-3 hover:bg-gray-100 focus:outline-hidden text-gray-800 hover:text-blue-600 focus:text-blue-600 " +
+                (isActive ? "bg-gray-100 text-blue-600" : "")
+              }
+            >
+              {/* icon */}
+              <svg
+                className="shrink-0 mt-0.5 size-4"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="m12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm-2-9a2 2 0 1 1 4 0 2 2 0 0 1-4 0Z" />
+                <path d="M17.8 18c-.5-.8-1.6-1.4-2.8-1.7-.6-.1-1.2-.2-1.8-.3H11c-.6 0-1.2.1-1.8.3-1.2.3-2.3.9-2.8 1.7" />
+              </svg>
+              Kategori
+            </NavLink>
+          </li>
+
+          <li className="px-2 lg:px-5">
+            <NavLink
+              to="/dashboard/pengguna"
+              className={({ isActive }) =>
+                "flex items-center gap-x-3 py-2 px-3 text-sm rounded-lg disabled:opacity-50 disabled:pointer-events-none px-3 hover:bg-gray-100 focus:outline-hidden text-gray-800 hover:text-blue-600 focus:text-blue-600 " +
+                (isActive ? "bg-gray-100 text-blue-600" : "")
+              }
+            >
+              {/* icon */}
+              <svg
+                className="shrink-0 mt-0.5 size-4"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="m12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm-2-9a2 2 0 1 1 4 0 2 2 0 0 1-4 0Z" />
+                <path d="M17.8 18c-.5-.8-1.6-1.4-2.8-1.7-.6-.1-1.2-.2-1.8-.3H11c-.6 0-1.2.1-1.8.3-1.2.3-2.3.9-2.8 1.7" />
+              </svg>
+              Pengguna
+            </NavLink>
+          </li>
+
+          {/* Disposisi */}
+          <li className="px-2 lg:px-5">
+            <NavLink
+              to="/dashboard/Disposisi"
+              className={({ isActive }) =>
+                "flex items-center gap-x-3 py-2 px-3 text-sm rounded-lg disabled:opacity-50 disabled:pointer-events-none px-3 hover:bg-gray-100 focus:outline-hidden text-gray-800 hover:text-blue-600 focus:text-blue-600 " +
+                (isActive ? "bg-gray-100 text-blue-600" : "")
+              }
+            >
+              {/* icon */}
+              <svg
+                className="shrink-0 mt-0.5 size-4"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="m12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm-2-9a2 2 0 1 1 4 0 2 2 0 0 1-4 0Z" />
+                <path d="M17.8 18c-.5-.8-1.6-1.4-2.8-1.7-.6-.1-1.2-.2-1.8-.3H11c-.6 0-1.2.1-1.8.3-1.2.3-2.3.9-2.8 1.7" />
+              </svg>
+              Disposisi
+            </NavLink>
+          </li>
+
 
           {/* Pengaturan */}
           <li className="px-2 lg:px-5">

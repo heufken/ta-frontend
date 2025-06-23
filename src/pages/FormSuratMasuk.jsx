@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 
-export default function FormSuratKeluar() {
+export default function FormSuratMasuk() {
   const [form, setForm] = useState({
     nomor: '',
     alamatPengirim: '',
@@ -14,7 +14,8 @@ export default function FormSuratKeluar() {
   });
   const [isiSurat, setIsiSurat] = useState('');
   const editorRef = useRef(null);
-  const [lastPayload, setLastPayload] = useState(null);
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const dropRef = useRef(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,19 +27,31 @@ export default function FormSuratKeluar() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const payload = {
-      ...form,
-      isiSurat,
-    };
-    console.log('Payload yang dikirim ke backend:', payload);
-    setLastPayload(payload);
-    // alert(JSON.stringify(payload, null, 2)); // Bisa diaktifkan jika ingin pakai alert
+    // Data isiSurat sudah dalam bentuk HTML
+    // Kirim ke backend bersama data form lain
+  };
+
+  const handleFileChange = (e) => {
+    setUploadedFile(e.target.files[0]);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      setUploadedFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
   };
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 shadow">
       <form className="w-full max-w-3xl mx-auto bg-white rounded-2xl p-8" onSubmit={handleSubmit}>
-        <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Form Pengisian Surat Keluar</h2>
+        <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Form Pengisian Surat Masuk</h2>
         {/* Grid utama 2 kolom */}
         <div className="grid grid-cols-2 md:grid-cols-1 gap-6 mb-6">
           <div>
@@ -78,25 +91,34 @@ export default function FormSuratKeluar() {
               <option>Jabatan 3</option>
             </select>
           </div>
-          {/* TinyMCE Editor Section */}
+          {/* TinyMCE Editor Section diganti Upload File Surat */}
           <div className="md:col-span-2 mb-6">
-            <label className="pl-form-label block text-xs font-semibold text-gray-600 mb-1">Isi Surat*</label>
-            <Editor
-              apiKey="m7vuqqw15g7uh89d0emklrwfxa39f2phpah7hvrfrox5c1gd"
-              onInit={(evt, editor) => editorRef.current = editor}
-              value={isiSurat}
-              onEditorChange={(content) => setIsiSurat(content)}
-              init={{
-                height: 300,
-                menubar: false,
-                plugins: [
-                  'table', 'lists', 'link', 'autolink', 'paste', 'fontfamily', 'fontsize'
-                ],
-                toolbar: 'undo redo | fontfamily fontsize | bold italic underline forecolor backcolor | bullist numlist | table | link',
-                table_toolbar: 'tableprops cellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
-                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
-              }}
-            />
+            <label className="pl-form-label block text-xs font-semibold text-gray-600 mb-1">Upload File Surat</label>
+            <div
+              ref={dropRef}
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-lg p-8 bg-gray-50 text-gray-500 cursor-pointer transition hover:border-blue-400"
+              style={{ minHeight: 150 }}
+              onClick={() => dropRef.current.querySelector('input[type=file]').click()}
+            >
+              <input
+                type="file"
+                className="hidden"
+                onChange={handleFileChange}
+                accept="application/pdf,image/*,.doc,.docx"
+              />
+              <div className="flex flex-col items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mb-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4a1 1 0 011-1h8a1 1 0 011 1v12m-4 4h-4a1 1 0 01-1-1v-4h6v4a1 1 0 01-1 1z" /></svg>
+                {uploadedFile ? (
+                  <span className="text-sm text-gray-700">{uploadedFile.name}</span>
+                ) : (
+                  <>
+                    <span className="text-sm">Drag & Drop your files or <span className="text-blue-600 underline">Browse</span></span>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </div>
         <div className="flex justify-end gap-2 pt-2">
@@ -108,13 +130,6 @@ export default function FormSuratKeluar() {
           </button>
         </div>
       </form>
-      {/* Tampilkan payload hasil submit untuk testing */}
-      {lastPayload && (
-        <div className="mt-8 bg-gray-50 border border-gray-200 rounded-lg p-4">
-          <div className="font-semibold mb-2 text-gray-700">Payload yang dikirim ke backend:</div>
-          <pre className="text-xs text-gray-800 whitespace-pre-wrap">{JSON.stringify(lastPayload, null, 2)}</pre>
-        </div>
-      )}
     </div>
   );
 }

@@ -11,9 +11,9 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50">
-      <div className="bg-white rounded-2xl shadow-sm flex w-full max-w-3xl overflow-hidden border border-gray-200">
+      <div className="bg-white rounded-2xl shadow-sm flex flex-col md:flex-row w-full max-w-4xl mx-2 overflow-hidden border border-gray-200">
         {/* Kiri: Logo & Judul */}
-        <div className="flex flex-col items-center justify-center flex-1 p-10">
+        <div className="flex flex-col items-center justify-center p-8 md:p-10 md:basis-1/2 md:max-w-[50%]">
           <div className="text-center mb-4">
             <div className="text-2xl font-bold text-green-700 mb-2 tracking-wide">E-ARSIP<br/><span className="text-base font-semibold text-gray-600">PCA MOJOTENGAH</span></div>
             {/* Ganti src logo di bawah dengan logo asli */}
@@ -21,15 +21,14 @@ export default function Login() {
           </div>
         </div>
         {/* Divider */}
-        <div className="w-px bg-gray-200" />
+        <div className="w-full h-px bg-gray-200 md:w-px md:h-auto" />
         {/* Kanan: Form Login */}
-        <div className="flex flex-col justify-center flex-1 p-10">
+        <div className="flex flex-col justify-center p-8 md:p-10 md:basis-1/2 md:max-w-[50%]">
           <h2 className="text-2xl font-bold text-center mb-6 text-gray-800 tracking-wide">LOGIN</h2>
           <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="email" className="block text-xs font-semibold text-gray-600 mb-1">Email</label>
               <div className="relative">
-                
                 <input
                   id="email"
                   name="email"
@@ -38,7 +37,7 @@ export default function Login() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 pr-3 py-2 block w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-200 focus:border-green-400 transition text-sm placeholder-gray-400 bg-gray-50"
+                  className="pl-3 pr-3 py-2 block w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-200 focus:border-green-400 transition text-sm placeholder-gray-400 bg-gray-50"
                   placeholder="Email Address"
                 />
               </div>
@@ -54,7 +53,7 @@ export default function Login() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 pr-3 py-2 block w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-200 focus:border-green-400 transition text-sm placeholder-gray-400 bg-gray-50"
+                  className="pl-3 pr-3 py-2 block w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-200 focus:border-green-400 transition text-sm placeholder-gray-400 bg-gray-50"
                   placeholder="Password"
                 />
               </div>
