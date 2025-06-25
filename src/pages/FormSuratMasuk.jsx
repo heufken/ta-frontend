@@ -1,21 +1,22 @@
-import { useState, useRef } from 'react';
-import { Editor } from '@tinymce/tinymce-react';
+import { useState, useRef, useEffect } from 'react';
+import { createInboxApi } from '../api/inbox';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { getCategoriesApi } from '../api/category';
 
 export default function FormSuratMasuk() {
   const [form, setForm] = useState({
     nomor: '',
     alamatPengirim: '',
-    lampiran: '',
-    lampiranTambahan: '',
-    tempatSuratDibuat: '',
     tanggal: '',
     kategori: '',
-    disposisi: '',
+    recievedDate: '',
   });
   const [isiSurat, setIsiSurat] = useState('');
-  const editorRef = useRef(null);
   const [uploadedFile, setUploadedFile] = useState(null);
   const dropRef = useRef(null);
+  const navigate = useNavigate();
+  const [categories, setCategories] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,10 +26,25 @@ export default function FormSuratMasuk() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Data isiSurat sudah dalam bentuk HTML
-    // Kirim ke backend bersama data form lain
+    const formData = new FormData();
+    formData.append('number', form.nomor);
+    formData.append('category', form.kategori);
+    formData.append('date', form.tanggal);
+    formData.append('recievedDate', form.recievedDate || new Date().toISOString());
+    formData.append('origin', form.alamatPengirim);
+    formData.append('summary', isiSurat);
+    if (uploadedFile) {
+      formData.append('attachments', uploadedFile);
+    }
+    try {
+      const res = await createInboxApi(formData);
+      toast.success('Surat masuk berhasil dibuat!');
+      navigate(`/dashboard/view-surat/${res.data.inbox._id}`);
+    } catch (err) {
+      toast.error('Gagal membuat surat masuk!');
+    }
   };
 
   const handleFileChange = (e) => {
@@ -48,11 +64,22 @@ export default function FormSuratMasuk() {
     e.stopPropagation();
   };
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await getCategoriesApi();
+        setCategories(res.data);
+      } catch (err) {
+        // handle error (opsional: toast)
+      }
+    };
+    fetchCategories();
+  }, []);
+
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 shadow">
       <form className="w-full max-w-3xl mx-auto bg-white rounded-2xl p-8" onSubmit={handleSubmit}>
         <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Form Pengisian Surat Masuk</h2>
-        {/* Grid utama 2 kolom */}
         <div className="grid grid-cols-2 md:grid-cols-1 gap-6 mb-6">
           <div>
             <label className="pl-form-label block text-xs font-semibold text-gray-600 mb-1">No Surat*</label>
@@ -63,37 +90,40 @@ export default function FormSuratMasuk() {
             <input name="alamatPengirim" value={form.alamatPengirim} onChange={handleChange} className="pl-form-input input input-bordered w-full" required />
           </div>
           <div>
-            <label className="pl-form-label block text-xs font-semibold text-gray-600 mb-1">Lampiran*</label>
-            <input name="lampiran" value={form.lampiran} onChange={handleChange} className="pl-form-input input input-bordered w-full" required />
-          </div>
-          <div>
-            <label className="pl-form-label block text-xs font-semibold text-gray-600 mb-1">Lampiran Tambahan (Jika Ada)</label>
-            <input name="lampiranTambahan" value={form.lampiranTambahan} onChange={handleChange} className="pl-form-input input input-bordered w-full" />
-          </div>
-          <div>
-            <label className="pl-form-label block text-xs font-semibold text-gray-600 mb-1">Tempat Surat Dibuat*</label>
-            <input name="tempatSuratDibuat" value={form.tempatSuratDibuat} onChange={handleChange} className="pl-form-input input input-bordered w-full" required />
-          </div>
-          <div>
             <label className="pl-form-label block text-xs font-semibold text-gray-600 mb-1">Tanggal Surat*</label>
             <input type="date" name="tanggal" value={form.tanggal} onChange={handleChange} className="pl-form-input input input-bordered w-full" required />
           </div>
           <div>
-            <label className="pl-form-label block text-xs font-semibold text-gray-600 mb-1">Kategori*</label>
-            <input name="kategori" value={form.kategori} onChange={handleChange} className="pl-form-input input input-bordered w-full" required />
+            <label className="pl-form-label block text-xs font-semibold text-gray-600 mb-1">Tanggal Diterima*</label>
+            <input type="date" name="recievedDate" value={form.recievedDate} onChange={handleChange} className="pl-form-input input input-bordered w-full" required />
           </div>
           <div>
-            <label className="pl-form-label block text-xs font-semibold text-gray-600 mb-1">Disposisi Jabatan*</label>
-            <select name="disposisi" value={form.disposisi} onChange={handleChange} className="pl-form-input input input-bordered w-full" required>
-              <option value="">Pilih Disposisi</option>
-              <option>Jabatan 1</option>
-              <option>Jabatan 2</option>
-              <option>Jabatan 3</option>
+            <label className="pl-form-label block text-xs font-semibold text-gray-600 mb-1">Kategori*</label>
+            <select
+              name="kategori"
+              value={form.kategori}
+              onChange={handleChange}
+              className="pl-form-input input input-bordered w-full"
+              required
+            >
+              <option value="">Pilih Kategori</option>
+              {categories.map(cat => (
+                <option key={cat._id} value={cat.name}>{cat.name}</option>
+              ))}
             </select>
           </div>
-          {/* TinyMCE Editor Section diganti Upload File Surat */}
           <div className="md:col-span-2 mb-6">
-            <label className="pl-form-label block text-xs font-semibold text-gray-600 mb-1">Upload File Surat</label>
+            <label className="pl-form-label block text-xs font-semibold text-gray-600 mb-1">Ringkasan Surat*</label>
+            <textarea
+              name="isiSurat"
+              value={isiSurat}
+              onChange={e => setIsiSurat(e.target.value)}
+              className="pl-form-input input input-bordered w-full min-h-[100px]"
+              required
+            />
+          </div>
+          <div className="md:col-span-2 mb-6">
+            <label className="pl-form-label block text-xs font-semibold text-gray-600 mb-1">Upload File Surat (Opsional)</label>
             <div
               ref={dropRef}
               onDrop={handleDrop}
@@ -113,9 +143,7 @@ export default function FormSuratMasuk() {
                 {uploadedFile ? (
                   <span className="text-sm text-gray-700">{uploadedFile.name}</span>
                 ) : (
-                  <>
-                    <span className="text-sm">Drag & Drop your files or <span className="text-blue-600 underline">Browse</span></span>
-                  </>
+                  <span className="text-sm">Drag & Drop your files or <span className="text-blue-600 underline">Browse</span></span>
                 )}
               </div>
             </div>

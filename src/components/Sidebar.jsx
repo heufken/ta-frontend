@@ -1,8 +1,10 @@
 import { NavLink } from "react-router-dom";
 import { useEffect } from "react";
+import { useAuth } from '../context/AuthContext';
 // import { useTheme } from '../contexts/ThemeContext'; // Keep the import for now
 
 export default function Sidebar() {
+  const { user, logout } = useAuth();
   // const { theme } = useTheme(); // Remove useTheme hook
 
   useEffect(() => {
@@ -30,8 +32,20 @@ export default function Sidebar() {
             />
           </svg>
         </div>
-        <div className="font-semibold text-gray-800">Nama User</div>
-        <div className="text-xs text-gray-500">Jabatan</div>
+        <div className="font-semibold text-gray-800">
+          {user ? user.name || user.username : 'Nama User'}
+        </div>
+        <div className="text-xs text-gray-500">
+          {user ? user.role : 'Jabatan'}
+        </div>
+        {user && (
+          <button
+            onClick={logout}
+            className="mt-3 px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm font-semibold transition"
+          >
+            Logout
+          </button>
+        )}
       </div>
 
       <nav className="w-full flex-1 hs-accordion-group">

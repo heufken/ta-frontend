@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
-import { createOutboxApi } from '../api/outbox';
+import { getOutboxByIdApi, updateOutboxApi } from '../api/outbox';
 import { getCategoriesApi } from '../api/category';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
-export default function FormSuratKeluar() {
+export default function EditSuratKeluar() {
   const [form, setForm] = useState({
     nomor: '',
     kategori: '',
@@ -17,11 +17,11 @@ export default function FormSuratKeluar() {
   const [content, setContent] = useState('');
   const [attachments, setAttachments] = useState([]);
   const [loading, setLoading] = useState(false);
-  const editorRef = useRef(null);
-  const [lastPayload, setLastPayload] = useState(null);
-  const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
+  const navigate = useNavigate();
+  const { id } = useParams();
 
+  // Fetch kategori
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -33,6 +33,29 @@ export default function FormSuratKeluar() {
     };
     fetchCategories();
   }, []);
+
+  // Fetch surat keluar untuk prefill
+  useEffect(() => {
+    const fetchSurat = async () => {
+      try {
+        const res = await getOutboxByIdApi(id);
+        const surat = res.data.outbox;
+        setForm({
+          nomor: surat.number,
+          kategori: surat.category,
+          tanggal: surat.date ? surat.date.slice(0, 10) : '',
+          destination: surat.destination,
+          summary: surat.summary,
+          sign: surat.sign,
+        });
+        setContent(surat.content || '');
+      } catch (err) {
+        toast.error('Gagal mengambil data surat keluar');
+        navigate('/dashboard/surat-keluar');
+      }
+    };
+    fetchSurat();
+  }, [id, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,11 +78,11 @@ export default function FormSuratKeluar() {
       formData.append('sign', form.sign);
       formData.append('content', content);
       attachments.forEach(file => formData.append('attachments', file));
-      await createOutboxApi(formData);
-      toast.success('Surat keluar berhasil dibuat!');
-      navigate('/dashboard/surat-keluar');
+      await updateOutboxApi(id, formData);
+      toast.success('Surat keluar berhasil diupdate!');
+      navigate(`/dashboard/view-surat-keluar/${id}`);
     } catch (err) {
-      toast.error('Gagal membuat surat keluar!');
+      toast.error('Gagal mengupdate surat keluar!');
     } finally {
       setLoading(false);
     }
@@ -68,7 +91,7 @@ export default function FormSuratKeluar() {
   return (
     <div className="min-h-screen flex items-center justify-center py-8">
       <form className="w-full max-w-2xl mx-auto bg-white rounded-2xl p-10 shadow-xl border border-gray-100" onSubmit={handleSubmit}>
-        <h2 className="text-3xl font-extrabold mb-8 text-blue-700 text-center tracking-tight drop-shadow">Form Pengisian Surat Keluar</h2>
+        <h2 className="text-3xl font-extrabold mb-8 text-blue-700 text-center tracking-tight drop-shadow">Edit Surat Keluar</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1">No Surat<span className="text-red-500">*</span></label>
@@ -106,7 +129,7 @@ export default function FormSuratKeluar() {
             <input name="sign" value={form.sign} onChange={handleChange} className="input input-bordered w-full focus:ring-2 focus:ring-blue-200" required />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1">Lampiran (opsional)</label>
+            <label className="block text-xs font-semibold text-gray-600 mb-1">Lampiran (opsional, akan menggantikan lampiran lama)</label>
             <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded px-3 py-2">
               <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M15.172 7l-6.586 6.586a2 2 0 1 0 2.828 2.828l6.586-6.586a2 2 0 1 0-2.828-2.828z"/></svg>
               <input type="file" multiple onChange={e => setAttachments([...e.target.files])} className="w-full text-sm text-gray-600 bg-transparent focus:outline-none" />
@@ -117,7 +140,7 @@ export default function FormSuratKeluar() {
           <label className="block text-xs font-semibold text-gray-600 mb-1">Isi Surat<span className="text-red-500">*</span></label>
           <div className="rounded border border-gray-200 shadow-sm overflow-hidden">
             <Editor
-              apiKey="m7vuqqw15g7uh89d0emklrwfxa39f2phpah7hvrfrox5c1gd"
+              apiKey={import.meta.env.VITE_TINYMCE_APIKEY}
               value={content}
               onEditorChange={setContent}
               init={{
@@ -139,20 +162,13 @@ export default function FormSuratKeluar() {
             ) : (
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
             )}
-            {loading ? 'Menyimpan...' : 'Simpan Data'}
+            {loading ? 'Menyimpan...' : 'Simpan Perubahan'}
           </button>
-          <button type="button" className="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg shadow hover:bg-gray-300 transition font-semibold" onClick={() => navigate('/dashboard/surat-keluar')}>
-            Kembali
+          <button type="button" className="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg shadow hover:bg-gray-300 transition font-semibold" onClick={() => navigate(`/dashboard/view-surat-keluar/${id}`)}>
+            Batal
           </button>
         </div>
       </form>
-      {/* Tampilkan payload hasil submit untuk testing */}
-      {lastPayload && (
-        <div className="mt-8 bg-gray-50 border border-gray-200 rounded-lg p-4">
-          <div className="font-semibold mb-2 text-gray-700">Payload yang dikirim ke backend:</div>
-          <pre className="text-xs text-gray-800 whitespace-pre-wrap">{JSON.stringify(lastPayload, null, 2)}</pre>
-        </div>
-      )}
     </div>
   );
 }
